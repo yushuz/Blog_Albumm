@@ -113,4 +113,5 @@ def handle_photo(src_dir, target_file):
         # print (json.load(fp)) # appveyor上进行打印会由于utf8发生编码错误
 
 if __name__ == "__main__":
-    handle_photo('photos/', '../themes/next/source/lib/ins/photo.json')
+    #handle_photo('photos/', '../themes/next/source/lib/ins/photo.json')
+    handle_photo('photos/', 'photo.json')
