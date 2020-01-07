@@ -3,6 +3,7 @@ import sys
 import json
 from PIL import Image
 from PIL.ExifTags import TAGS
+
 '''
 解决裁剪压缩后的图片Orientation信息不正确问题
 '''
@@ -52,7 +53,10 @@ def list_img_file(directory):
     new_list = []
     for filename in old_list:
         name, fileformat = filename.split(".")
-        if fileformat.lower() == "jpg" or fileformat.lower() == "png" or fileformat.lower() == "gif":
+        if name.startswith('new_') and fileformat.lower() == "jpg":
+            # if fileformat.lower() == "jpg" or fileformat.lower() == "png" or fileformat.lower() == "gif":
+            os.rename(directory + filename, directory + filename.strip('new_'))
+            filename = filename.strip('new_')
             new_list.append(filename)
     # print new_list
     return new_list
@@ -63,6 +67,7 @@ def generateThumbnail(src_dir, des_dir):
     if not os.path.exists(des_dir):
         os.makedirs(des_dir)
     file_list = list_img_file(src_dir)
+    print(file_list)
     if file_list:
         for infile in file_list:
             im = Image.open(src_dir+infile)
@@ -71,7 +76,8 @@ def generateThumbnail(src_dir, des_dir):
             copy = im.crop(get_crop_region(im.size[0], im.size[1]))
             copy.thumbnail((600, 600))
             copy.save(des_dir+infile, 'JPEG')
-            print("successfully compress " + infile)
+            print("successfully compress")
+            # print("successfully compress " + infile) # appveyor编码utf8报错
 
 if __name__ == '__main__':
     generateThumbnail('photos/', 'min_photos/')

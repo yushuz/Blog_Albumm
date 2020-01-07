@@ -1,1 +1,0 @@
-"D:\Application\Anaconda3\python.exe" upload-a-file-to-qiniu(md).py %1
