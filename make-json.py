@@ -26,13 +26,26 @@ def list_img_file(directory):
     old_list = os.listdir(directory)
     # print old_list
     new_list = []
+    tmp_list = set()
+
     for filename in old_list:
         name, fileformat = filename.split(".")
-        if fileformat.lower() == "jpg" or fileformat.lower() == "png" or \
-           fileformat.lower() == "gif" or fileformat.lower() == "mp4" or \
+        if fileformat.lower() == "jpg" or fileformat.lower() == "mp4" or \
            fileformat.lower() == "webm":
-            new_list.append(filename)
-    # print new_list
+            tmp_list.add(name)
+
+    for filename in old_list:
+        name, fileformat = filename.split(".")
+        if fileformat.lower() == "jpg" or fileformat.lower() == "mp4" or \
+           fileformat.lower() == "webm":
+            if name in tmp_list:
+                tmp_list.remove(name)
+                new_list.append(filename)
+            else:
+                if fileformat.lower() == "mp4" or fileformat.lower() == "webm":
+                    new_list.remove(name + '.jpg')
+                    new_list.append(filename)
+    # print(new_list)
     return new_list
 
 
@@ -43,11 +56,11 @@ def handle_photo(src_dir, target_file):
     最后将data.json文件存到博客的source/photo文件夹下
     '''
     file_list = list_img_file(src_dir)
-    file_list.sort()
+    file_list.sort(reverse=True)
     list_info = []
     for i in range(len(file_list)):
         filename = file_list[i]
-        print(filename)
+        print(filename.encode("utf-8"))
         date_str, info = filename.split("_")
         info, _type = info.split(".")
         date = datetime.strptime(date_str, "%Y-%m-%d")
@@ -76,7 +89,7 @@ def handle_photo(src_dir, target_file):
                                                     }
                         }
             list_info.append(new_dict)
-        elif year_month != list_info[-1]['date']:  # 不是最后的一个日期，就新建一个dict
+        elif year_month != list_info[-1]['date']:  # 不是同一个月，就新建一个dict
             new_dict = {"date": year_month, "arr": {'year': date.year,
                                                     'month': date.month,
                                                     'link': [filename],
@@ -86,17 +99,18 @@ def handle_photo(src_dir, target_file):
                                                     }
                         }
             list_info.append(new_dict)
-        else:  # 同一个日期
+        else:  # 同一个月
             list_info[-1]['arr']['link'].append(filename)
             list_info[-1]['arr']['text'].append(info)
             list_info[-1]['arr']['type'].append(_type)
             list_info[-1]['arr']['size'].append(size)
-    list_info.reverse()  # 翻转
+    
+    # list_info = sorted(list_info, key = lambda emp:emp['date'])  # 排序
     final_dict = {"list": list_info}
-    with open("../source/photo-test/" + target_file, "w") as fp:
+    with open(target_file, "w") as fp:
         json.dump(final_dict, fp, indent=4, separators=(',', ': '))
-    with open("../source/photo-test/" + target_file, "r") as fp:
-        print (json.load(fp))
+    # with open(target_file, "r") as fp:
+        # print (json.load(fp)) # appveyor上进行打印会由于utf8发生编码错误
 
 if __name__ == "__main__":
-    handle_photo('photos/', 'photo.json')
+    handle_photo('photos/', '../themes/next/source/lib/ins/photo.json')
