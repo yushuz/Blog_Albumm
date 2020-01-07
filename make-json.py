@@ -93,10 +93,10 @@ def handle_photo(src_dir, target_file):
             list_info[-1]['arr']['size'].append(size)
     list_info.reverse()  # 翻转
     final_dict = {"list": list_info}
-    with open("../Blog_Source/source/photo/" + target_file, "w") as fp:
+    with open("../source/photo-test/" + target_file, "w") as fp:
         json.dump(final_dict, fp, indent=4, separators=(',', ': '))
-    with open("../Blog_Source/source/photo/" + target_file, "r") as fp:
+    with open("../source/photo-test/" + target_file, "r") as fp:
         print (json.load(fp))
 
 if __name__ == "__main__":
-    handle_photo('album/photos/', 'photo.json')
+    handle_photo('photos/', 'photo.json')
